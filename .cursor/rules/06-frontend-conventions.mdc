@@ -1,0 +1,98 @@
+
+---
+description: Convenções de implementação Angular e TypeScript
+globs:
+  - "frontend/**/*.ts"
+  - "frontend/**/*.html"
+  - "frontend/**/*.scss"
+  - "frontend/**/*.css"
+alwaysApply: false
+---
+
+# Frontend Conventions
+
+## TypeScript
+
+- Utilizar TypeScript strict.
+- Evitar any.
+- Definir interfaces e tipos explícitos.
+- Evitar casts desnecessários.
+- Preferir tipos específicos.
+- Não utilizar non-null assertion sem justificativa.
+
+## Angular
+
+- Utilizar Angular 21.
+- Priorizar standalone components.
+- Utilizar inject() ou injeção por construtor de maneira consistente.
+- Utilizar signals quando apropriado.
+- Utilizar RxJS para fluxos assíncronos.
+- Evitar abstrações desnecessárias.
+- Seguir as convenções oficiais do Angular.
+
+## Componentes
+
+- Manter componentes pequenos.
+- Evitar lógica de negócio em componentes.
+- Utilizar inputs e outputs quando necessário.
+- Preferir componentes reutilizáveis quando existir necessidade real.
+- Evitar componentes excessivamente genéricos.
+
+## Templates
+
+- Evitar lógica complexa nos templates.
+- Utilizar control flow moderno do Angular (@if, @for).
+- Evitar chamadas de métodos custosos durante a renderização.
+- Utilizar track em loops quando apropriado.
+- Manter templates legíveis.
+
+## Services
+
+- Centralizar chamadas HTTP.
+- Separar comunicação com API da apresentação.
+- Utilizar tipos explícitos para requisições e respostas.
+- Evitar duplicação de operações.
+- Não criar services sem necessidade.
+
+## RxJS e Signals
+
+- Compreender a diferença entre estado reativo e fluxos assíncronos.
+- Evitar subscriptions desnecessárias.
+- Preferir async pipe ou integração com signals quando apropriado.
+- Gerenciar corretamente o ciclo de vida das subscriptions.
+- Evitar converter Observables em Promises sem necessidade.
+
+## Formulários
+
+- Utilizar Reactive Forms.
+- Definir validações no formulário.
+- Exibir mensagens de erro compreensíveis.
+- Evitar duplicação de validações.
+- Tratar estados de submissão.
+
+## HTTP
+
+- Utilizar HttpClient.
+- Utilizar interceptors para comportamentos transversais.
+- Centralizar tratamento de erros HTTP.
+- Evitar chamadas HTTP diretamente nos componentes quando houver service responsável.
+- Não armazenar informações sensíveis desnecessariamente.
+
+## Interface
+
+- Utilizar Angular Material.
+- Implementar feedback de carregamento.
+- Exibir mensagens de erro e sucesso.
+- Tratar listas vazias.
+- Manter consistência visual.
+- Garantir responsividade.
+
+## Aprendizado
+
+Ao introduzir um conceito novo:
+- Explicar o conceito de forma objetiva.
+- Mostrar sua responsabilidade no código.
+- Explicar por que foi escolhido.
+- Relacionar com React ou JavaScript quando isso facilitar o entendimento.
+
+Não utilizar APIs antigas do Angular apenas por familiaridade.

@@ -1,0 +1,124 @@
+
+---
+description: Restrições de execução, comandos e alterações no ambiente
+alwaysApply: true
+---
+
+# Development Workflow
+
+## Regra principal
+
+O Cursor deve atuar exclusivamente na análise, leitura e edição de código.
+
+Não possui autorização para controlar o ambiente de desenvolvimento.
+
+## Comandos proibidos
+
+Nunca executar comandos de instalação ou atualização de dependências.
+
+Exemplos:
+- npm install
+- npm ci
+- npm update
+- npx para instalação ou execução de ferramentas
+- mvn install
+- mvn package
+- mvn dependency:resolve
+- qualquer gerenciador de pacotes ou instalador equivalente.
+
+Nunca executar ou iniciar aplicações.
+
+Exemplos:
+- npm start
+- npm run start
+- ng serve
+- ng build
+- mvn spring-boot:run
+- java -jar
+- qualquer comando para iniciar servidores ou aplicações.
+
+Nunca executar:
+- docker
+- docker compose
+- migrações de banco de dados.
+- comandos de inicialização de infraestrutura.
+- scripts que alterem o banco de dados.
+- comandos de deploy.
+- comandos que alterem configurações do ambiente.
+
+## Git
+
+Não executar operações que modifiquem o repositório.
+
+Proibidos:
+- git add
+- git commit
+- git push
+- git pull
+- git merge
+- git rebase
+- git reset
+- git checkout
+- git stash
+
+Permitidos somente para inspeção:
+- git status
+- git diff
+- git log
+- git show
+- git branch
+
+## Comandos permitidos
+
+Comandos de leitura e inspeção:
+- pwd
+- ls
+- find
+- cat
+- head
+- tail
+- less
+- grep
+- rg
+- tree
+- wc
+
+Também são permitidos comandos de inspeção de código que não alterem arquivos de dependências (pom.xml, package.json, etc) ou iniciem aplicações.
+
+Exemplos:
+- Typecheck do TypeScript, somente se a ferramenta já estiver disponível e o comando não instalar dependências.
+- Consultas de versões instaladas.
+- Análise estática sem alterações no projeto.
+
+## Testes e validações
+
+Não executar testes automaticamente.
+
+Não iniciar aplicações para verificar funcionalidades.
+
+Não executar builds.
+
+O desenvolvedor poderá solicitar explicitamente a execução de testes, builds ou aplicações em uma solicitação específica.
+
+## Alterações de dependências
+
+- Nunca adicionar dependências automaticamente.
+- Nunca remover dependências automaticamente.
+- Nunca atualizar versões automaticamente.
+- Nunca modificar package.json, package-lock.json, pom.xml ou arquivos equivalentes para adicionar dependências sem autorização.
+- Não modificar arquivos de lock sem autorização.
+
+## Execução de comandos
+
+- Não executar comandos compostos que possam esconder operações proibidas.
+- Não utilizar scripts para contornar essas restrições.
+- Em caso de dúvida sobre a segurança de um comando, não executá-lo.
+- Solicitar autorização antes de executar qualquer operação fora do escopo permitido.
+
+## Comportamento esperado
+
+Ao concluir uma implementação:
+1. Informar os arquivos criados ou modificados.
+2. Resumir as alterações.
+3. Informar quais validações poderiam ser executadas.
+4. Não executar essas validações automaticamente se dependerem de comandos proibidos.

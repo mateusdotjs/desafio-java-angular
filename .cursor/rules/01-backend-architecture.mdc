@@ -1,0 +1,138 @@
+---
+description: Arquitetura e organização do backend Spring Boot
+globs:
+  - "backend/**/*.java"
+  - "backend/**/*.xml"
+  - "backend/**/*.yml"
+  - "backend/**/*.yaml"
+alwaysApply: false
+---
+# Arquitetura do Backend
+
+## Arquitetura adotada
+
+Utilizar arquitetura em camadas com organização por domínio (package by feature).
+
+Não implementar Clean Architecture, Hexagonal Architecture ou DDD tático completo. A solução deve permanecer simples e proporcional ao tamanho da aplicação.
+
+## Organização dos pacotes
+
+Estrutura de referência:
+
+src/main/java/com/example/
+├── config/
+├── security/
+├── common/
+│   ├── exception/
+│   └── response/
+├── auth/
+├── user/
+│   ├── controller/
+│   ├── service/
+│   ├── repository/
+│   ├── entity/
+│   ├── dto/
+│   └── mapper/
+├── address/
+│   ├── controller/
+│   ├── service/
+│   ├── repository/
+│   ├── entity/
+│   ├── dto/
+│   └── mapper/
+└── zipcode/
+    ├── client/
+    ├── dto/
+    └── service/
+
+Adaptar o package base ao nome real do projeto.
+
+## Responsabilidades
+
+### Controllers
+- Expor endpoints REST.
+- Receber e validar requisições.
+- Delegar operações aos Services.
+- Retornar respostas HTTP apropriadas.
+- Não implementar regras de negócio.
+- Não acessar repositories diretamente.
+
+### Services
+- Concentrar regras de negócio.
+- Coordenar operações entre repositories e outros serviços.
+- Controlar transações.
+- Garantir regras de autorização relacionadas aos recursos.
+- Não depender de detalhes HTTP.
+
+### Repositories
+- Responsáveis pelo acesso ao banco.
+- Utilizar Spring Data JPA.
+- Implementar consultas específicas somente quando necessário.
+
+### Entities
+- Representar entidades persistidas.
+- Não expor entidades diretamente nos endpoints.
+- Não utilizar anotações indiscriminadamente.
+- Configurar relacionamentos e restrições de integridade corretamente.
+
+### DTOs
+- Separar objetos de entrada e saída.
+- Não reutilizar DTOs de criação para respostas quando suas responsabilidades forem diferentes.
+- Utilizar Bean Validation.
+- Não expor senhas nas respostas.
+
+### Mappers
+- Centralizar conversões entre DTOs e Entities.
+- Preferir mapeamento explícito.
+- Não adicionar bibliotecas de mapeamento sem necessidade.
+
+## Relacionamentos
+
+- Um User possui múltiplos Address.
+- Definir o relacionamento JPA de maneira consistente.
+- Evitar serialização recursiva de entidades.
+- Evitar carregamento desnecessário de relacionamentos.
+- Considerar o comportamento de exclusão e integridade referencial.
+
+## Segurança
+
+- Utilizar Spring Security.
+- Implementar autenticação JWT.
+- Criptografar senhas utilizando BCrypt.
+- Utilizar roles ADMIN e USER.
+- Garantir autorização também na camada de serviço.
+- Nunca confiar no ID de usuário enviado pelo cliente para determinar a propriedade de um recurso.
+- Obter a identidade do usuário autenticado a partir do contexto de segurança.
+
+## Integração ViaCEP
+
+- Isolar a comunicação externa no módulo zipcode.
+- Utilizar cliente HTTP apropriado do Spring.
+- Separar DTO externo dos modelos internos.
+- Tratar CEP inexistente, respostas inválidas e indisponibilidade do serviço.
+- Não acoplar a lógica de negócio à estrutura de transporte do ViaCEP.
+
+## Tratamento de erros
+
+- Implementar Global Exception Handler com @RestControllerAdvice.
+- Padronizar respostas de erro.
+- Tratar erros de validação, autenticação, autorização, recursos inexistentes e conflitos.
+- Não retornar stack traces ao cliente.
+
+## Persistência
+
+- Utilizar PostgreSQL.
+- Utilizar Flyway para versionamento do schema.
+- Não depender de ddl-auto=create ou create-drop.
+- Utilizar transações quando necessário.
+- Implementar paginação com Pageable.
+- Restringir os campos permitidos para ordenação.
+
+## Princípios
+
+- Controllers pequenos.
+- Services com responsabilidades claras.
+- Evitar abstrações prematuras.
+- Não criar interfaces para toda classe sem necessidade.
+- Evitar métodos genéricos que escondam regras de negócio.
+- Preferir composição a hierarquias desnecessárias.

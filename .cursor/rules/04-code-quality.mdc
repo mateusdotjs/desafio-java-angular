@@ -1,0 +1,58 @@
+
+---
+description: Princípios gerais de qualidade e manutenção do código
+alwaysApply: true
+---
+
+# Code Quality
+
+## Princípios
+
+- Priorizar simplicidade, legibilidade e manutenção.
+- Aplicar SOLID quando fizer sentido.
+- Seguir Clean Code.
+- Evitar duplicação de código.
+- Manter responsabilidades bem definidas.
+- Preferir soluções explícitas e fáceis de entender.
+
+## Evitar
+
+- Overengineering.
+- Abstrações prematuras.
+- Design patterns sem necessidade real.
+- Classes, interfaces e serviços desnecessários.
+- Métodos excessivamente genéricos.
+- Configurações duplicadas.
+- Dependências desnecessárias.
+- Código morto.
+- Comentários que apenas repetem o código.
+- Implementações fictícias ou placeholders.
+- Dados mockados para simular funcionalidades reais.
+
+## Implementação
+
+- Implementar somente o escopo solicitado.
+- Não antecipar funcionalidades futuras.
+- Não modificar partes não relacionadas à tarefa.
+- Preservar convenções já estabelecidas.
+- Reutilizar código existente quando apropriado.
+- Considerar casos de erro e entradas inválidas.
+- Evitar efeitos colaterais inesperados.
+
+## Decisões técnicas
+
+Antes de introduzir uma abstração ou biblioteca:
+1. Verificar se já existe solução no projeto.
+2. Avaliar se a complexidade adicional é realmente necessária.
+3. Preferir a solução mais simples que atenda aos requisitos.
+
+Não introduzir tecnologias, bibliotecas ou padrões arquiteturais por preferência pessoal.
+
+## Comunicação
+
+Quando houver decisões relevantes:
+- Explicar brevemente o motivo.
+- Informar impactos na arquitetura.
+- Apresentar alternativas somente quando houver uma decisão realmente relevante.
+
+Não gerar explicações extensas para alterações simples.

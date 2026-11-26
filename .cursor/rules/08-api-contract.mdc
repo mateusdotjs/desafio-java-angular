@@ -1,0 +1,67 @@
+
+---
+description: Contrato de comunicação entre backend e frontend
+globs:
+  - "backend/**/*.java"
+  - "frontend/**/*.ts"
+alwaysApply: false
+---
+
+# API Contract
+
+## Princípio
+
+O backend é responsável por definir o contrato da API REST.
+
+O frontend deve consumir esse contrato sem duplicar ou reinterpretar regras de negócio.
+
+## Convenções
+
+- Utilizar JSON.
+- Utilizar nomes de propriedades em camelCase.
+- Utilizar datas em formato ISO 8601.
+- Utilizar status HTTP apropriados.
+- Manter respostas e erros padronizados.
+- Utilizar DTOs específicos para entrada e saída.
+
+## Paginação
+
+Utilizar parâmetros consistentes:
+- page
+- size
+- sort
+
+Definir claramente se a paginação é baseada em índice zero.
+
+Validar os campos permitidos para ordenação no backend.
+
+## Autenticação
+
+- Login deve retornar o token JWT conforme o contrato definido.
+- Endpoints protegidos devem exigir autenticação.
+- O frontend deve enviar o token no cabeçalho Authorization.
+- Utilizar o esquema Bearer.
+
+## Erros
+
+Padronizar respostas de erro para facilitar o tratamento no frontend.
+
+Considerar:
+- Erros de validação.
+- Não autenticado.
+- Sem permissão.
+- Recurso inexistente.
+- Conflitos.
+- Erros internos.
+
+## Alterações de contrato
+
+Sempre que alterar um endpoint:
+1. Identificar os impactos no frontend.
+2. Atualizar os DTOs ou interfaces correspondentes.
+3. Atualizar os services consumidores.
+4. Ajustar os componentes afetados.
+
+Nunca alterar unilateralmente o formato de uma resposta sem verificar os consumidores existentes.
+
+Não criar estruturas duplicadas para representar o mesmo contrato.

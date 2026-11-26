@@ -1,0 +1,65 @@
+
+---
+description: Estratégia e convenções de testes
+globs:
+  - "backend/**/*Test.java"
+  - "backend/**/*Tests.java"
+  - "frontend/**/*.spec.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Objetivo
+
+Garantir o comportamento correto das funcionalidades, priorizando testes relevantes.
+
+## Backend
+
+Tecnologias:
+- JUnit 5.
+- Mockito 5.
+- Spring Boot Test.
+- MockMvc.
+
+### Testes unitários
+
+- Testar regras de negócio dos Services.
+- Utilizar Mockito para dependências externas.
+- Testar cenários de sucesso e falha.
+- Não utilizar contexto Spring desnecessariamente.
+- Não testar detalhes internos de implementação.
+
+### Testes de integração
+
+- Testar endpoints principais.
+- Verificar status HTTP e estrutura das respostas.
+- Testar validações.
+- Testar autenticação e autorização.
+- Testar isolamento de dados entre usuários.
+- Utilizar banco de teste isolado quando necessário.
+- Mockar integrações externas como ViaCEP.
+
+## Frontend
+
+- Utilizar testes de componentes e serviços.
+- Testar comportamentos observáveis.
+- Testar formulários e validações.
+- Testar interceptors e guards.
+- Mockar respostas HTTP quando apropriado.
+- Evitar testes dependentes de serviços externos reais.
+
+## Qualidade dos testes
+
+- Testes devem ser independentes.
+- Evitar dependência de ordem de execução.
+- Utilizar nomes descritivos.
+- Não adicionar testes triviais sem valor.
+- Não alterar testes apenas para contornar falhas de implementação.
+- Não ignorar cenários negativos.
+
+## Execução
+
+Não executar testes automaticamente.
+
+A execução depende de autorização explícita do desenvolvedor.

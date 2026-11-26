@@ -1,0 +1,125 @@
+
+---
+description: Arquitetura e organização do frontend Angular
+globs:
+  - "frontend/**/*.ts"
+  - "frontend/**/*.html"
+  - "frontend/**/*.scss"
+  - "frontend/**/*.css"
+alwaysApply: false
+---
+
+# Arquitetura do Frontend
+
+## Tecnologias
+
+- Angular 21.
+- TypeScript.
+- RxJS.
+- Angular Material.
+- Angular Router.
+- Reactive Forms.
+- HttpClient.
+
+## Arquitetura
+
+Utilizar organização por funcionalidades (feature-based).
+
+Estrutura de referência:
+
+src/app/
+├── core/
+│   ├── auth/
+│   ├── guards/
+│   ├── interceptors/
+│   └── services/
+├── shared/
+│   ├── components/
+│   ├── models/
+│   └── pipes/
+├── features/
+│   ├── auth/
+│   │   ├── login/
+│   │   └── register/
+│   ├── dashboard/
+│   ├── users/
+│   └── addresses/
+├── app.component.ts
+├── app.config.ts
+└── app.routes.ts
+
+Ajustar a estrutura conforme a necessidade real, sem criar diretórios vazios ou funcionalidades inexistentes.
+
+## Angular moderno
+
+- Utilizar standalone components.
+- Utilizar configuração moderna baseada em app.config.ts.
+- Utilizar Angular Router.
+- Utilizar Reactive Forms.
+- Utilizar HttpClient para comunicação com o backend.
+- Utilizar signals quando forem adequados para estado local.
+- Utilizar RxJS para operações assíncronas e fluxos de dados.
+- Evitar NgModules para novas funcionalidades.
+
+## Componentes
+
+- Responsáveis pela apresentação e interação com o usuário.
+- Não devem concentrar regras de negócio.
+- Devem ser pequenos e possuir responsabilidades claras.
+- Devem delegar comunicação HTTP aos Services.
+
+## Services
+
+- Centralizar comunicação com a API.
+- Compartilhar operações e lógica reutilizável.
+- Utilizar injeção de dependências do Angular.
+- Não misturar responsabilidades de apresentação.
+
+## Comunicação HTTP
+
+- Utilizar HttpClient.
+- Definir interfaces e tipos para requisições e respostas.
+- Centralizar a URL base da API em configuração apropriada.
+- Tratar erros HTTP de maneira consistente.
+- Não realizar chamadas HTTP diretamente nos templates.
+
+## Autenticação
+
+- Implementar fluxo de login e registro.
+- Utilizar interceptor HTTP para adicionar o JWT.
+- Utilizar guards para proteger rotas.
+- Tratar expiração e falha de autenticação.
+- Não considerar guards como mecanismo de segurança definitivo.
+- A autorização real deve ser garantida pelo backend.
+
+## Formulários
+
+- Utilizar Reactive Forms.
+- Implementar validações adequadas.
+- Exibir mensagens de validação claras.
+- Evitar duplicação de regras de validação.
+- Desabilitar ações durante submissões quando necessário.
+
+## Interface
+
+- Utilizar Angular Material.
+- Manter consistência visual.
+- Implementar estados de carregamento.
+- Exibir feedback de sucesso e erro.
+- Tratar estados vazios.
+- Implementar layout responsivo.
+- Evitar componentes visuais excessivamente complexos.
+
+## Aprendizado
+
+O desenvolvedor possui experiência prévia com JavaScript, TypeScript e React, mas está aprendendo Angular.
+
+Ao implementar conceitos importantes:
+- Explicar brevemente o conceito utilizado.
+- Explicar a responsabilidade dos arquivos criados.
+- Explicar como funciona a comunicação entre componentes e services.
+- Quando útil, relacionar o conceito a algo equivalente em React ou JavaScript.
+- Não gerar explicações extensas para conceitos triviais.
+- Não esconder decisões arquiteturais em abstrações desnecessárias.
+
+Priorizar código que o desenvolvedor consiga compreender e manter.

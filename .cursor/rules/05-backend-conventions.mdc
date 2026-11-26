@@ -1,0 +1,81 @@
+
+---
+description: Convenções de implementação Java e Spring Boot
+globs:
+  - "backend/**/*.java"
+alwaysApply: false
+---
+
+# Backend Conventions
+
+## Java
+
+- Utilizar Java 17.
+- Seguir convenções oficiais de nomenclatura.
+- Utilizar records para DTOs imutáveis quando apropriado.
+- Preferir tipos explícitos.
+- Evitar uso desnecessário de Optional.
+- Evitar métodos excessivamente longos.
+- Evitar variáveis e métodos com nomes genéricos.
+
+## Spring
+
+- Utilizar Spring Boot 4.2.
+- Utilizar injeção de dependências por construtor.
+- Preferir anotações específicas às genéricas quando aplicável.
+- Manter Controllers pequenos.
+- Concentrar regras de negócio nos Services.
+- Utilizar @Transactional na camada de serviço quando necessário.
+- Evitar dependências circulares.
+
+## JPA e Hibernate
+
+- Evitar exposição direta de Entities.
+- Utilizar DTOs nas entradas e saídas da API.
+- Configurar relacionamentos explicitamente.
+- Evitar FetchType.EAGER sem necessidade.
+- Evitar problemas de N+1.
+- Definir corretamente estratégias de carregamento.
+- Evitar cascades indiscriminados.
+- Garantir integridade referencial.
+
+## Segurança
+
+- Nunca armazenar senhas em texto puro.
+- Utilizar BCryptPasswordEncoder.
+- Nunca retornar hashes de senhas.
+- Não registrar tokens ou credenciais em logs.
+- Validar autorização no backend.
+- Não confiar em identificadores enviados pelo cliente para definir propriedade de recursos.
+
+## APIs REST
+
+- Utilizar métodos HTTP conforme sua semântica.
+- Utilizar status codes apropriados.
+- Utilizar paginação com Pageable.
+- Validar campos de ordenação permitidos.
+- Validar entradas utilizando Jakarta Bean Validation.
+- Manter respostas consistentes.
+- Evitar retornar entidades diretamente.
+
+## Tratamento de exceções
+
+- Utilizar exceções específicas.
+- Centralizar tratamento HTTP em @RestControllerAdvice.
+- Não utilizar exceções genéricas para representar todas as falhas.
+- Não expor informações internas ao cliente.
+
+## Integrações externas
+
+- Isolar clientes HTTP.
+- Definir timeouts apropriados.
+- Tratar falhas de comunicação.
+- Validar respostas externas.
+- Não propagar indiscriminadamente exceções de bibliotecas externas.
+
+## Testabilidade
+
+- Preferir dependências injetadas.
+- Evitar estado global.
+- Evitar lógica acoplada ao ambiente.
+- Permitir substituição de dependências em testes.
