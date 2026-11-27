@@ -54,6 +54,7 @@ button.active {
 
 .line {
   margin: 0;
+  font: var(--mat-sys-title-medium);
 }
 
 .muted {

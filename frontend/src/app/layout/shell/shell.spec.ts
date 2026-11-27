@@ -33,15 +33,19 @@ describe('Shell', () => {
 
   it('mostra Usuários só para admin', () => {
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).not.toContain('Usuários');
+    expect(usersLink()).toBeNull();
 
     TestBed.inject(AuthSession).establish('token', user);
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Minha conta');
-    expect(fixture.nativeElement.textContent).not.toContain('Usuários');
+    expect(usersLink()).toBeNull();
 
     TestBed.inject(AuthSession).establish('token', { ...user, role: 'ADMIN' });
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Usuários');
+    expect(usersLink()?.textContent).toContain('Usuários');
   });
+
+  function usersLink(): HTMLAnchorElement | null {
+    return fixture.nativeElement.querySelector('nav a[href="/users"]');
+  }
 });

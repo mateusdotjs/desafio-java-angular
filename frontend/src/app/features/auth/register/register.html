@@ -23,11 +23,13 @@
           <mat-error>{{ message }}</mat-error>
         }
       </mat-form-field>
-      <button matButton="filled" type="submit" [disabled]="submitting()" [showProgress]="submitting()">
-        Criar conta
-        <mat-progress-spinner progressIndicator mode="indeterminate" diameter="20" />
-      </button>
+      <div class="actions">
+        <button matButton="filled" type="submit" [disabled]="submitting()" [showProgress]="submitting()">
+          Criar conta
+          <mat-progress-spinner progressIndicator mode="indeterminate" diameter="20" />
+        </button>
+        <a matButton routerLink="/login">Já tenho conta</a>
+      </div>
     </form>
-    <p class="auth-switch"><a routerLink="/login">Já tenho conta</a></p>
   </mat-card-content>
 </mat-card>
