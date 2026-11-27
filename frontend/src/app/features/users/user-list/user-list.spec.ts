@@ -1,7 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { API_URL } from '../../../core/api-url';
@@ -30,7 +29,6 @@ describe('UserList', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideNoopAnimations(),
         { provide: ActivatedRoute, useValue: { snapshot: { data: { title: 'Usuários' } } } },
         { provide: NotificationService, useValue: { success: () => undefined, error: () => undefined } },
       ],

@@ -1,7 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 import { of } from 'rxjs';
@@ -32,7 +31,6 @@ describe('UserForm', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideNoopAnimations(),
         { provide: ActivatedRoute, useValue: activatedRoute() },
         { provide: NotificationService, useValue: { success: () => undefined, error: () => undefined } },
       ],
@@ -61,11 +59,13 @@ describe('UserForm', () => {
       email: 'ana@example.com',
       password: null,
     });
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     request.flush({ ...user, name: 'Ana Souza' });
     fixture.detectChanges();
 
     expect(TestBed.inject(AuthSession).user()?.name).toBe('Ana Souza');
     expect(TestBed.inject(AuthSession).accessToken()).toBe('token');
+    expect(navigate).toHaveBeenCalledWith(['/me']);
   });
 
   it('exige 8 caracteres quando a senha é preenchida', () => {
@@ -89,7 +89,6 @@ describe('UserForm ao criar', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideNoopAnimations(),
         { provide: ActivatedRoute, useValue: createRoute() },
         { provide: NotificationService, useValue: { success: () => undefined, error: () => undefined } },
       ],

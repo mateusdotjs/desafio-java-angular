@@ -1,7 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 import { of } from 'rxjs';
@@ -45,7 +44,6 @@ describe('Account', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideNoopAnimations(),
         { provide: ActivatedRoute, useValue: activatedRoute() },
         { provide: NotificationService, useValue: { success: () => undefined, error: () => undefined } },
       ],
@@ -110,7 +108,6 @@ describe('Account de um usuário da lista', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideNoopAnimations(),
         { provide: ActivatedRoute, useValue: activatedRoute('8') },
         { provide: NotificationService, useValue: { success: () => undefined, error: () => undefined } },
       ],
@@ -157,7 +154,6 @@ describe('Account ao apagar o próprio usuário', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideNoopAnimations(),
         { provide: ActivatedRoute, useValue: activatedRoute('7') },
         { provide: NotificationService, useValue: { success: () => undefined, error: () => undefined } },
       ],
