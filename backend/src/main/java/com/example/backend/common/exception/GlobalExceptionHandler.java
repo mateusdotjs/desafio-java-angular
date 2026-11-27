@@ -3,6 +3,8 @@ package com.example.backend.common.exception;
 import java.time.Instant;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,6 +20,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException exception, HttpServletRequest request) {
@@ -67,6 +71,12 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
 	public ResponseEntity<ErrorResponse> handleBadRequest(Exception exception, HttpServletRequest request) {
 		return error(HttpStatus.BAD_REQUEST, "Malformed request", request, List.of());
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponse> handleUnexpected(Exception exception, HttpServletRequest request) {
+		log.error("Unhandled exception", exception);
+		return error(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", request, List.of());
 	}
 
 	private ResponseEntity<ErrorResponse> error(
