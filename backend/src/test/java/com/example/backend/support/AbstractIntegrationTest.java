@@ -40,6 +40,7 @@ public abstract class AbstractIntegrationTest {
 	@DynamicPropertySource
 	static void datasource(DynamicPropertyRegistry registry) {
 		PostgresContainer.registerDatasource(registry);
+		registry.add("app.admin.enabled", () -> "false");
 	}
 
 	@BeforeEach
