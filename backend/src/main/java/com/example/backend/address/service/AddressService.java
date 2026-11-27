@@ -15,6 +15,7 @@ import com.example.backend.address.repository.AddressRepository;
 import com.example.backend.common.exception.InvalidZipCodeException;
 import com.example.backend.common.exception.ResourceNotFoundException;
 import com.example.backend.common.pagination.SortValidator;
+import com.example.backend.security.SecurityUtils;
 import com.example.backend.user.entity.User;
 import com.example.backend.user.repository.UserRepository;
 import com.example.backend.zipcode.service.ZipCodeService;
@@ -42,6 +43,7 @@ public class AddressService {
 
 	@Transactional
 	public AddressResponse create(Long userId, AddressRequest request) {
+		SecurityUtils.assertAdminOrOwner(userId);
 		User user = getUser(userId);
 		String zipCode = normalizeZipCode(request.zipCode());
 		zipCodeService.validate(zipCode);
@@ -50,17 +52,20 @@ public class AddressService {
 	}
 
 	public Page<AddressResponse> list(Long userId, Pageable pageable) {
+		SecurityUtils.assertAdminOrOwner(userId);
 		SortValidator.validate(pageable, ALLOWED_SORTS);
 		getUser(userId);
 		return addressRepository.findByUserId(userId, pageable).map(AddressMapper::toResponse);
 	}
 
 	public AddressResponse findById(Long userId, Long addressId) {
+		SecurityUtils.assertAdminOrOwner(userId);
 		return AddressMapper.toResponse(getAddress(userId, addressId));
 	}
 
 	@Transactional
 	public AddressResponse update(Long userId, Long addressId, AddressRequest request) {
+		SecurityUtils.assertAdminOrOwner(userId);
 		Address address = getAddress(userId, addressId);
 		String zipCode = normalizeZipCode(request.zipCode());
 		zipCodeService.validate(zipCode);
@@ -70,6 +75,7 @@ public class AddressService {
 
 	@Transactional
 	public void delete(Long userId, Long addressId) {
+		SecurityUtils.assertAdminOrOwner(userId);
 		Address address = getAddress(userId, addressId);
 		addressRepository.delete(address);
 	}

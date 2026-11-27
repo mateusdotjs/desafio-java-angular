@@ -38,7 +38,7 @@ public class UserController {
 
 	@PostMapping
 	public ResponseEntity<UserResponse> create(@Valid @RequestBody UserCreateRequest request) {
-		UserResponse response = userService.create(request);
+		UserResponse response = userService.createAsAdmin(request);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
 				.path("/{id}")
 				.buildAndExpand(response.id())

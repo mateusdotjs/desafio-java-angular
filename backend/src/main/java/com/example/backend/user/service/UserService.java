@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.backend.common.exception.EmailAlreadyExistsException;
 import com.example.backend.common.exception.ResourceNotFoundException;
 import com.example.backend.common.pagination.SortValidator;
+import com.example.backend.security.SecurityUtils;
 import com.example.backend.user.dto.UserCreateRequest;
 import com.example.backend.user.dto.UserResponse;
 import com.example.backend.user.dto.UserUpdateRequest;
@@ -36,6 +37,12 @@ public class UserService {
 	}
 
 	@Transactional
+	public UserResponse createAsAdmin(UserCreateRequest request) {
+		SecurityUtils.assertAdmin();
+		return create(request);
+	}
+
+	@Transactional
 	public UserResponse create(UserCreateRequest request) {
 		String email = normalizeEmail(request.email());
 		if (userRepository.existsByEmail(email)) {
@@ -52,16 +59,23 @@ public class UserService {
 	}
 
 	public Page<UserResponse> list(Pageable pageable) {
+		SecurityUtils.assertAdmin();
 		SortValidator.validate(pageable, ALLOWED_SORTS);
 		return userRepository.findAll(pageable).map(UserMapper::toResponse);
 	}
 
 	public UserResponse findById(Long id) {
+		SecurityUtils.assertAdminOrOwner(id);
+		return UserMapper.toResponse(getUser(id));
+	}
+
+	public UserResponse findByIdForAuth(Long id) {
 		return UserMapper.toResponse(getUser(id));
 	}
 
 	@Transactional
 	public UserResponse update(Long id, UserUpdateRequest request) {
+		SecurityUtils.assertAdminOrOwner(id);
 		User user = getUser(id);
 		String email = normalizeEmail(request.email());
 		if (userRepository.existsByEmailAndIdNot(email, id)) {
@@ -84,6 +98,7 @@ public class UserService {
 
 	@Transactional
 	public void delete(Long id) {
+		SecurityUtils.assertAdminOrOwner(id);
 		if (!userRepository.existsById(id)) {
 			throw new ResourceNotFoundException("User not found");
 		}

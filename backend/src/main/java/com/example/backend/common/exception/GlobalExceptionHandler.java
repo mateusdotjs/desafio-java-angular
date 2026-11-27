@@ -44,6 +44,16 @@ public class GlobalExceptionHandler {
 		return error(HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage(), request, List.of());
 	}
 
+	@ExceptionHandler(InvalidCredentialsException.class)
+	public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException exception, HttpServletRequest request) {
+		return error(HttpStatus.UNAUTHORIZED, exception.getMessage(), request, List.of());
+	}
+
+	@ExceptionHandler(ForbiddenAccessException.class)
+	public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenAccessException exception, HttpServletRequest request) {
+		return error(HttpStatus.FORBIDDEN, exception.getMessage(), request, List.of());
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException exception, HttpServletRequest request) {
 		List<FieldErrorResponse> fieldErrors = exception.getBindingResult().getFieldErrors().stream()
