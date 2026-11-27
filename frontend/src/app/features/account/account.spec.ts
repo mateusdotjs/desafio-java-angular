@@ -2,7 +2,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
+import { vi } from 'vitest';
 import { of } from 'rxjs';
 
 import { API_URL } from '../../core/api-url';
@@ -81,6 +82,8 @@ describe('Account', () => {
     expect(text).toContain('Sé — São Paulo/SP');
     expect(text).toContain('CEP 01310-100');
     expect(text).toContain('Novo endereço');
+    expect(text).not.toContain('Apagar usuário');
+    expect(text).not.toContain('Voltar');
   });
 
   it('mostra a lista vazia', () => {
@@ -95,6 +98,98 @@ describe('Account', () => {
   });
 });
 
+describe('Account de um usuário da lista', () => {
+  let fixture: ComponentFixture<Account>;
+  let http: HttpTestingController;
+
+  beforeEach(async () => {
+    localStorage.clear();
+    await TestBed.configureTestingModule({
+      imports: [Account],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideNoopAnimations(),
+        { provide: ActivatedRoute, useValue: activatedRoute('8') },
+        { provide: NotificationService, useValue: { success: () => undefined, error: () => undefined } },
+      ],
+    }).compileComponents();
+
+    TestBed.inject(AuthSession).establish('token', user);
+    http = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(Account);
+  });
+
+  afterEach(() => {
+    http.verify();
+    TestBed.inject(AuthSession).clear();
+  });
+
+  it('apaga outro usuário e volta para a lista', () => {
+    http.expectOne(`${API_URL}/api/users/8`).flush({ ...user, id: 8, name: 'Bruno' });
+    http.expectOne((req) => req.url === `${API_URL}/api/users/8/addresses`).flush(pageOf([]));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Voltar');
+    clickButton(fixture, 'Apagar usuário');
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    clickButton(fixture, 'Confirmar exclusão');
+
+    const request = http.expectOne((req) => req.method === 'DELETE' && req.url === `${API_URL}/api/users/8`);
+    request.flush(null);
+    fixture.detectChanges();
+
+    expect(navigate).toHaveBeenCalledWith(['/users']);
+    expect(TestBed.inject(AuthSession).isAuthenticated()).toBe(true);
+  });
+});
+
+describe('Account ao apagar o próprio usuário', () => {
+  let fixture: ComponentFixture<Account>;
+  let http: HttpTestingController;
+
+  beforeEach(async () => {
+    localStorage.clear();
+    await TestBed.configureTestingModule({
+      imports: [Account],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideNoopAnimations(),
+        { provide: ActivatedRoute, useValue: activatedRoute('7') },
+        { provide: NotificationService, useValue: { success: () => undefined, error: () => undefined } },
+      ],
+    }).compileComponents();
+
+    TestBed.inject(AuthSession).establish('token', user);
+    http = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(Account);
+  });
+
+  afterEach(() => {
+    http.verify();
+    TestBed.inject(AuthSession).clear();
+  });
+
+  it('encerra a sessão e volta para o login', () => {
+    http.expectOne(`${API_URL}/api/users/7`).flush(user);
+    http.expectOne((req) => req.url === `${API_URL}/api/users/7/addresses`).flush(pageOf([]));
+    fixture.detectChanges();
+
+    clickButton(fixture, 'Apagar usuário');
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    clickButton(fixture, 'Confirmar exclusão');
+
+    const request = http.expectOne((req) => req.method === 'DELETE' && req.url === `${API_URL}/api/users/7`);
+    request.flush(null);
+
+    expect(navigate).toHaveBeenCalledWith(['/login']);
+    expect(TestBed.inject(AuthSession).isAuthenticated()).toBe(false);
+  });
+});
+
 function pageOf(content: Address[]) {
   return {
     content,
@@ -106,10 +201,18 @@ function pageOf(content: Address[]) {
   };
 }
 
-function activatedRoute() {
-  const params = convertToParamMap({});
+function activatedRoute(userId?: string) {
+  const params = convertToParamMap(userId === undefined ? {} : { userId });
   return {
-    snapshot: { paramMap: params, data: { title: 'Minha conta' } },
+    snapshot: { paramMap: params, data: { title: userId === undefined ? 'Minha conta' : 'Usuário' } },
     paramMap: of(params),
   };
+}
+
+function clickButton(fixture: ComponentFixture<Account>, label: string): void {
+  const buttons = [...fixture.nativeElement.querySelectorAll('button')] as HTMLButtonElement[];
+  const button = buttons.find((item) => item.textContent?.includes(label));
+  if (!button) throw new Error(`Botão ${label} não encontrado`);
+  button.click();
+  fixture.detectChanges();
 }

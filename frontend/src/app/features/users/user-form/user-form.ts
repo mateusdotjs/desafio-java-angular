@@ -10,7 +10,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthSession } from '../../../core/auth/auth-session';
-import { UserUpdateRequest } from '../../../core/auth/auth.models';
+import { UserCreateRequest, UserUpdateRequest } from '../../../core/auth/auth.models';
 import { applyServerErrors, controlError, requiredText } from '../../../core/forms/validation';
 import { apiErrorMessage, readApiError } from '../../../core/http/api-error';
 import { ownerId } from '../../../core/routing/owner-id';
@@ -46,14 +46,19 @@ export class UserForm {
   private readonly userId: number | null;
 
   protected readonly title = routeTitle();
-  protected readonly creating = this.route.snapshot.routeConfig?.path === 'users/new';
+  protected readonly creating = this.route.snapshot.data['create'] === true;
   protected readonly loading = signal(false);
   protected readonly failed = signal(false);
   protected readonly submitting = signal(false);
   protected readonly form = inject(FormBuilder).nonNullable.group({
     name: ['', [requiredText, Validators.maxLength(255)]],
     email: ['', [requiredText, Validators.email, Validators.maxLength(255)]],
-    password: ['', [Validators.minLength(8), Validators.maxLength(72)]],
+    password: [
+      '',
+      this.creating
+        ? [Validators.required, Validators.minLength(8), Validators.maxLength(72)]
+        : [Validators.minLength(8), Validators.maxLength(72)],
+    ],
   });
 
   constructor() {
@@ -76,6 +81,7 @@ export class UserForm {
   }
 
   protected backLink(): string[] {
+    if (this.creating) return ['/users'];
     const raw = this.route.snapshot.paramMap.get('userId');
     return raw === null ? ['/me'] : ['/users', raw];
   }
@@ -84,20 +90,41 @@ export class UserForm {
     this.form.controls.name.setValue(this.form.controls.name.value.trim());
     this.form.controls.email.setValue(this.form.controls.email.value.trim());
     this.form.controls.password.setValue(this.form.controls.password.value.trim());
-    if (this.form.invalid || this.userId === null) {
+    if (this.form.invalid || (!this.creating && this.userId === null)) {
       this.form.markAllAsTouched();
       return;
     }
 
     const { name, email, password } = this.form.getRawValue();
-    const request: UserUpdateRequest = {
-      name,
-      email,
-      password: password.length > 0 ? password : null,
-    };
+    if (this.creating) {
+      this.create({ name, email, password });
+      return;
+    }
+    if (this.userId === null) return;
+    this.update(this.userId, { name, email, password: password.length > 0 ? password : null });
+  }
+
+  private create(request: UserCreateRequest): void {
     this.submitting.set(true);
     this.users
-      .update(this.userId, request)
+      .create(request)
+      .pipe(
+        finalize(() => this.submitting.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (created) => {
+          this.notifications.success('Usuário criado.');
+          void this.router.navigate(['/users', created.id]);
+        },
+        error: (error: unknown) => this.reportSaveError(error),
+      });
+  }
+
+  private update(userId: number, request: UserUpdateRequest): void {
+    this.submitting.set(true);
+    this.users
+      .update(userId, request)
       .pipe(
         finalize(() => this.submitting.set(false)),
         takeUntilDestroyed(this.destroyRef),

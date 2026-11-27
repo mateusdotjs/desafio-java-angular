@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -19,6 +19,7 @@ export class Shell {
 
   protected readonly isAuthenticated = this.session.isAuthenticated;
   protected readonly user = this.session.user;
+  protected readonly isAdmin = computed(() => this.user()?.role === 'ADMIN');
 
   protected logout(): void {
     this.auth.logout();

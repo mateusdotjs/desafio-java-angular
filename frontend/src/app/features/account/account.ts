@@ -4,10 +4,11 @@ import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatPaginator, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EMPTY, Subject, catchError, finalize, forkJoin, map, switchMap } from 'rxjs';
 
 import { AuthSession } from '../../core/auth/auth-session';
+import { AuthService } from '../../core/auth/auth.service';
 import { User } from '../../core/auth/auth.models';
 import { formatZipCode } from '../../core/forms/validation';
 import { apiErrorMessage } from '../../core/http/api-error';
@@ -16,6 +17,7 @@ import { ownerId } from '../../core/routing/owner-id';
 import { routeTitle } from '../../core/routing/route-title';
 import { NotificationService } from '../../core/services/notification.service';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { portuguesePaginatorIntl } from '../../shared/paginator-intl';
 import { Address } from '../addresses/address.models';
 import { AddressService } from '../addresses/address.service';
 import { UserService } from '../users/user.service';
@@ -43,8 +45,10 @@ interface AccountSnapshot {
 })
 export class Account {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly session = inject(AuthSession);
+  private readonly auth = inject(AuthService);
   private readonly users = inject(UserService);
   private readonly addresses = inject(AddressService);
   private readonly notifications = inject(NotificationService);
@@ -63,6 +67,9 @@ export class Account {
   protected readonly pageSize = signal(PAGE_SIZE);
   protected readonly confirmingId = signal<number | null>(null);
   protected readonly deletingId = signal<number | null>(null);
+  protected readonly managed = signal(false);
+  protected readonly confirmingUser = signal(false);
+  protected readonly deletingUser = signal(false);
 
   constructor() {
     this.loads
@@ -104,7 +111,7 @@ export class Account {
   }
 
   protected changePage(event: PageEvent): void {
-    if (this.deletingId() !== null) return;
+    if (this.deletingId() !== null || this.deletingUser()) return;
     const userId = this.currentUserId();
     if (userId === null) return;
     if (event.pageIndex === this.pageIndex() && event.pageSize === this.pageSize()) return;
@@ -115,7 +122,8 @@ export class Account {
   }
 
   protected askDelete(addressId: number): void {
-    if (this.deletingId() !== null) return;
+    if (this.deletingId() !== null || this.deletingUser()) return;
+    this.confirmingUser.set(false);
     this.confirmingId.set(addressId);
   }
 
@@ -126,7 +134,7 @@ export class Account {
 
   protected confirmDelete(addressId: number): void {
     const userId = this.currentUserId();
-    if (userId === null || this.deletingId() !== null) return;
+    if (userId === null || this.deletingId() !== null || this.deletingUser()) return;
     this.deletingId.set(addressId);
     this.addresses
       .delete(userId, addressId)
@@ -145,8 +153,45 @@ export class Account {
       });
   }
 
+  protected askDeleteUser(): void {
+    if (this.deletingId() !== null || this.deletingUser()) return;
+    this.confirmingId.set(null);
+    this.confirmingUser.set(true);
+  }
+
+  protected cancelDeleteUser(): void {
+    if (this.deletingUser()) return;
+    this.confirmingUser.set(false);
+  }
+
+  protected confirmDeleteUser(): void {
+    const userId = this.currentUserId();
+    if (userId === null || !this.managed() || this.deletingUser() || this.deletingId() !== null) return;
+    this.deletingUser.set(true);
+    this.users
+      .delete(userId)
+      .pipe(
+        finalize(() => this.deletingUser.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.notifications.success('Usuário apagado.');
+          if (this.session.user()?.id === userId) {
+            this.auth.logout();
+            void this.router.navigate(['/login']);
+            return;
+          }
+          void this.router.navigate(['/users']);
+        },
+        error: (error: unknown) => this.notifications.error(apiErrorMessage(error)),
+      });
+  }
+
   private openAccount(rawUserId: string | null): void {
     const userId = ownerId(rawUserId, this.session.user()?.id ?? null);
+    this.managed.set(rawUserId !== null);
+    this.confirmingUser.set(false);
     this.confirmingId.set(null);
     this.pageIndex.set(0);
     this.pageSize.set(PAGE_SIZE);
@@ -208,18 +253,3 @@ export class Account {
   }
 }
 
-function portuguesePaginatorIntl(): MatPaginatorIntl {
-  const intl = new MatPaginatorIntl();
-  intl.itemsPerPageLabel = 'Itens por página';
-  intl.nextPageLabel = 'Próxima página';
-  intl.previousPageLabel = 'Página anterior';
-  intl.firstPageLabel = 'Primeira página';
-  intl.lastPageLabel = 'Última página';
-  intl.getRangeLabel = (page, pageSize, length) => {
-    if (length === 0 || pageSize === 0) return `0 de ${length}`;
-    const start = page * pageSize;
-    const end = Math.min(start + pageSize, length);
-    return `${start + 1}–${end} de ${length}`;
-  };
-  return intl;
-}

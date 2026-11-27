@@ -1,1 +1,61 @@
-<h1>Usuários</h1>
+<h1>{{ title }}</h1>
+
+<div class="toolbar">
+  <div class="sort" role="group" aria-label="Ordenar por">
+    <span class="sort-label">Ordenar por</span>
+    @for (option of sortOptions; track option.field) {
+      <button
+        matButton
+        type="button"
+        [class.active]="sortField() === option.field"
+        [attr.aria-pressed]="sortField() === option.field"
+        (click)="sortBy(option.field)"
+      >
+        {{ option.label }}
+        @if (directionLabel(option.field); as direction) {
+          <span class="sort-direction">{{ direction }}</span>
+        }
+      </button>
+    }
+  </div>
+  <a matButton="filled" routerLink="/users/new">Novo usuário</a>
+</div>
+
+@if (loading()) {
+  <div class="loader">
+    <mat-progress-spinner mode="indeterminate" diameter="40" />
+  </div>
+} @else if (failed()) {
+  <p class="feedback">Não foi possível carregar os usuários.</p>
+} @else {
+  @if (listLoading()) {
+    <div class="loader">
+      <mat-progress-spinner mode="indeterminate" diameter="32" />
+    </div>
+  } @else if (items().length === 0) {
+    <app-empty-state message="Nenhum usuário cadastrado" />
+  } @else {
+    <ul class="users">
+      @for (user of items(); track user.id) {
+        <li>
+          <p class="line">{{ user.name }}</p>
+          <p class="muted">{{ user.email }}</p>
+          <p class="muted">{{ roleLabel(user.role) }} · {{ createdAtLabel(user.createdAt) }}</p>
+          <div class="actions">
+            <a matButton [routerLink]="['/users', user.id]">Abrir</a>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (totalElements() > 0) {
+    <mat-paginator
+      [length]="totalElements()"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="changePage($event)"
+    />
+  }
+}

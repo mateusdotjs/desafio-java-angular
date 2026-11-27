@@ -4,7 +4,9 @@
     @if (isAuthenticated()) {
       <span class="user-name">{{ user()?.name }}</span>
       <a matButton routerLink="/me" routerLinkActive="active" ariaCurrentWhenActive="page">Minha conta</a>
-      <a matButton routerLink="/users" routerLinkActive="active" ariaCurrentWhenActive="page">Usuários</a>
+      @if (isAdmin()) {
+        <a matButton routerLink="/users" routerLinkActive="active" ariaCurrentWhenActive="page">Usuários</a>
+      }
       <button matButton type="button" (click)="logout()">Sair</button>
     } @else {
       <a matButton routerLink="/login" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Entrar</a>

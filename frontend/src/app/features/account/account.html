@@ -1,5 +1,9 @@
 <h1>{{ title }}</h1>
 
+@if (managed()) {
+  <a class="back" matButton routerLink="/users">Voltar</a>
+}
+
 @if (loading()) {
   <div class="loader">
     <mat-progress-spinner mode="indeterminate" diameter="40" />
@@ -29,6 +33,25 @@
       </dl>
       <div class="actions">
         <a matButton [routerLink]="editProfileLink()">Editar dados</a>
+        @if (managed()) {
+          @if (confirmingUser()) {
+            <button matButton type="button" (click)="confirmDeleteUser()" [disabled]="deletingUser()">
+              Confirmar exclusão
+            </button>
+            <button matButton type="button" (click)="cancelDeleteUser()" [disabled]="deletingUser()">
+              Cancelar
+            </button>
+          } @else {
+            <button
+              matButton
+              type="button"
+              (click)="askDeleteUser()"
+              [disabled]="deletingUser() || deletingId() !== null"
+            >
+              Apagar usuário
+            </button>
+          }
+        }
       </div>
     </mat-card-content>
   </mat-card>
@@ -62,15 +85,25 @@
                   matButton
                   type="button"
                   (click)="confirmDelete(address.id)"
-                  [disabled]="deletingId() !== null"
+                  [disabled]="deletingId() !== null || deletingUser()"
                 >
                   Confirmar exclusão
                 </button>
-                <button matButton type="button" (click)="cancelDelete()" [disabled]="deletingId() !== null">
+                <button
+                  matButton
+                  type="button"
+                  (click)="cancelDelete()"
+                  [disabled]="deletingId() !== null || deletingUser()"
+                >
                   Cancelar
                 </button>
               } @else {
-                <button matButton type="button" (click)="askDelete(address.id)" [disabled]="deletingId() !== null">
+                <button
+                  matButton
+                  type="button"
+                  (click)="askDelete(address.id)"
+                  [disabled]="deletingId() !== null || deletingUser()"
+                >
                   Apagar
                 </button>
               }

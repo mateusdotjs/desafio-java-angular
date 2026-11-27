@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 
 import { AuthSession } from './core/auth/auth-session';
-import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { adminGuard, authGuard, guestGuard } from './core/guards/auth.guard';
 import { AddressForm } from './features/addresses/address-form/address-form';
 import { Account } from './features/account/account';
 import { Login } from './features/auth/login/login';
@@ -36,26 +36,37 @@ export const routes: Routes = [
             data: { title: 'Editar endereço' },
             component: AddressForm,
           },
-          { path: 'users', title: 'Usuários', component: UserList },
-          { path: 'users/new', title: 'Novo usuário', data: { title: 'Novo usuário' }, component: UserForm },
-          { path: 'users/:userId', title: 'Usuário', data: { title: 'Usuário' }, component: Account },
           {
-            path: 'users/:userId/edit',
-            title: 'Editar usuário',
-            data: { title: 'Editar usuário' },
-            component: UserForm,
-          },
-          {
-            path: 'users/:userId/addresses/new',
-            title: 'Novo endereço',
-            data: { title: 'Novo endereço' },
-            component: AddressForm,
-          },
-          {
-            path: 'users/:userId/addresses/:addressId/edit',
-            title: 'Editar endereço',
-            data: { title: 'Editar endereço' },
-            component: AddressForm,
+            path: 'users',
+            canActivate: [adminGuard],
+            children: [
+              { path: '', pathMatch: 'full', title: 'Usuários', data: { title: 'Usuários' }, component: UserList },
+              {
+                path: 'new',
+                title: 'Novo usuário',
+                data: { title: 'Novo usuário', create: true },
+                component: UserForm,
+              },
+              { path: ':userId', title: 'Usuário', data: { title: 'Usuário' }, component: Account },
+              {
+                path: ':userId/edit',
+                title: 'Editar usuário',
+                data: { title: 'Editar usuário' },
+                component: UserForm,
+              },
+              {
+                path: ':userId/addresses/new',
+                title: 'Novo endereço',
+                data: { title: 'Novo endereço' },
+                component: AddressForm,
+              },
+              {
+                path: ':userId/addresses/:addressId/edit',
+                title: 'Editar endereço',
+                data: { title: 'Editar endereço' },
+                component: AddressForm,
+              },
+            ],
           },
           { path: '**', redirectTo: '/me' },
         ],

@@ -26,6 +26,12 @@ export interface RegisterRequest {
   password: string;
 }
 
+export interface UserCreateRequest {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export interface UserUpdateRequest {
   name: string;
   email: string;
