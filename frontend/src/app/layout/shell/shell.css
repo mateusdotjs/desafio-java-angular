@@ -32,6 +32,13 @@ a.active {
   background: color-mix(in srgb, var(--mat-sys-primary) 16%, transparent);
 }
 
+.user-name {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0.75rem;
+  font: var(--mat-sys-label-large);
+}
+
 main {
   flex: 1;
   width: 100%;

@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+.auth-card {
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+h1 {
+  margin-bottom: 1.5rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+button[type='submit'] {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+}
+
+.auth-switch {
+  margin: 1rem 0 0;
+}
+
+a {
+  color: var(--mat-sys-primary);
+}

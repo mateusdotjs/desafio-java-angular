@@ -1,1 +1,17 @@
 <h1>{{ title }}</h1>
+
+@if (loading()) {
+  <div class="loader">
+    <mat-progress-spinner mode="indeterminate" diameter="40" />
+  </div>
+} @else if (failed()) {
+  <p class="feedback">Não foi possível carregar os endereços.</p>
+} @else if (items().length === 0) {
+  <app-empty-state message="Nenhum endereço cadastrado" />
+} @else {
+  <ul class="addresses">
+    @for (address of items(); track address.id) {
+      <li>{{ address.street }}, {{ address.number }} — {{ address.city }}</li>
+    }
+  </ul>
+}
