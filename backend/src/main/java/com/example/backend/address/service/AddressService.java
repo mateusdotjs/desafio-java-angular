@@ -23,7 +23,6 @@ import com.example.backend.zipcode.dto.ZipCodeLookupResponse;
 import com.example.backend.zipcode.service.ZipCodeService;
 
 @Service
-@Transactional(readOnly = true)
 public class AddressService {
 
 	private static final Set<String> ALLOWED_SORTS = Set.of("street", "neighborhood", "city", "state", "zipCode");
@@ -57,6 +56,7 @@ public class AddressService {
 		});
 	}
 
+	@Transactional(readOnly = true)
 	public Page<AddressResponse> list(Long userId, Pageable pageable) {
 		SecurityUtils.assertAdminOrOwner(userId);
 		SortValidator.validate(pageable, ALLOWED_SORTS);
@@ -64,6 +64,7 @@ public class AddressService {
 		return addressRepository.findByUserId(userId, pageable).map(AddressMapper::toResponse);
 	}
 
+	@Transactional(readOnly = true)
 	public AddressResponse findById(Long userId, Long addressId) {
 		SecurityUtils.assertAdminOrOwner(userId);
 		return AddressMapper.toResponse(getAddress(userId, addressId));

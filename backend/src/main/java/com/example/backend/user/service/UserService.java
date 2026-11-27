@@ -22,7 +22,6 @@ import com.example.backend.user.mapper.UserMapper;
 import com.example.backend.user.repository.UserRepository;
 
 @Service
-@Transactional(readOnly = true)
 public class UserService {
 
 	private static final Set<String> ALLOWED_SORTS = Set.of("name", "email", "createdAt");
@@ -58,17 +57,20 @@ public class UserService {
 		}
 	}
 
+	@Transactional(readOnly = true)
 	public Page<UserResponse> list(Pageable pageable) {
 		SecurityUtils.assertAdmin();
 		SortValidator.validate(pageable, ALLOWED_SORTS);
 		return userRepository.findAll(pageable).map(UserMapper::toResponse);
 	}
 
+	@Transactional(readOnly = true)
 	public UserResponse findById(Long id) {
 		SecurityUtils.assertAdminOrOwner(id);
 		return UserMapper.toResponse(getUser(id));
 	}
 
+	@Transactional(readOnly = true)
 	public UserResponse findByIdForAuth(Long id) {
 		return UserMapper.toResponse(getUser(id));
 	}
