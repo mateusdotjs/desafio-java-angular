@@ -1,32 +1,31 @@
 package com.example.backend.address.mapper;
 
-import java.util.Locale;
-
 import com.example.backend.address.dto.AddressRequest;
 import com.example.backend.address.dto.AddressResponse;
 import com.example.backend.address.entity.Address;
 import com.example.backend.user.entity.User;
+import com.example.backend.zipcode.dto.ZipCodeLookupResponse;
 
 public final class AddressMapper {
 
 	private AddressMapper() {
 	}
 
-	public static Address toEntity(AddressRequest request, String zipCode, User user) {
+	public static Address toEntity(AddressRequest request, ZipCodeLookupResponse lookup, User user) {
 		Address address = new Address();
-		apply(address, request, zipCode);
+		apply(address, request, lookup);
 		address.setUser(user);
 		return address;
 	}
 
-	public static void apply(Address address, AddressRequest request, String zipCode) {
-		address.setStreet(request.street().trim());
+	public static void apply(Address address, AddressRequest request, ZipCodeLookupResponse lookup) {
+		address.setStreet(lookup.street());
 		address.setNumber(request.number().trim());
 		address.setComplement(blankToNull(request.complement()));
-		address.setNeighborhood(request.neighborhood().trim());
-		address.setCity(request.city().trim());
-		address.setState(request.state().trim().toUpperCase(Locale.ROOT));
-		address.setZipCode(zipCode);
+		address.setNeighborhood(lookup.neighborhood());
+		address.setCity(lookup.city());
+		address.setState(lookup.state());
+		address.setZipCode(lookup.zipCode());
 	}
 
 	public static AddressResponse toResponse(Address address) {

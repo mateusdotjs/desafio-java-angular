@@ -5,11 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record AddressRequest(
-		@NotBlank @Size(max = 255) String street,
+		@NotBlank @Pattern(regexp = "^\\d{8}$") String zipCode,
 		@NotBlank @Size(max = 20) String number,
-		@Size(max = 255) String complement,
-		@NotBlank @Size(max = 255) String neighborhood,
-		@NotBlank @Size(max = 255) String city,
-		@NotBlank @Pattern(regexp = "^[A-Za-z]{2}$") String state,
-		@NotBlank @Pattern(regexp = "^\\d{8}$") String zipCode) {
+		@Size(max = 255) String complement) {
 }

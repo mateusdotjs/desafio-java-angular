@@ -5,19 +5,21 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.example.backend.address.dto.AddressRequest;
 import com.example.backend.address.dto.AddressResponse;
 import com.example.backend.address.entity.Address;
 import com.example.backend.address.mapper.AddressMapper;
 import com.example.backend.address.repository.AddressRepository;
-import com.example.backend.common.exception.InvalidZipCodeException;
 import com.example.backend.common.exception.ResourceNotFoundException;
 import com.example.backend.common.pagination.SortValidator;
 import com.example.backend.security.SecurityUtils;
 import com.example.backend.user.entity.User;
 import com.example.backend.user.repository.UserRepository;
+import com.example.backend.zipcode.dto.ZipCodeLookupResponse;
 import com.example.backend.zipcode.service.ZipCodeService;
 
 @Service
@@ -32,23 +34,27 @@ public class AddressService {
 
 	private final ZipCodeService zipCodeService;
 
+	private final TransactionTemplate transactionTemplate;
+
 	public AddressService(
 			AddressRepository addressRepository,
 			UserRepository userRepository,
-			ZipCodeService zipCodeService) {
+			ZipCodeService zipCodeService,
+			PlatformTransactionManager transactionManager) {
 		this.addressRepository = addressRepository;
 		this.userRepository = userRepository;
 		this.zipCodeService = zipCodeService;
+		this.transactionTemplate = new TransactionTemplate(transactionManager);
 	}
 
-	@Transactional
 	public AddressResponse create(Long userId, AddressRequest request) {
 		SecurityUtils.assertAdminOrOwner(userId);
-		User user = getUser(userId);
-		String zipCode = normalizeZipCode(request.zipCode());
-		zipCodeService.validate(zipCode);
-		Address address = AddressMapper.toEntity(request, zipCode, user);
-		return AddressMapper.toResponse(addressRepository.save(address));
+		ZipCodeLookupResponse lookup = zipCodeService.lookup(request.zipCode());
+		return transactionTemplate.execute(status -> {
+			User user = getUser(userId);
+			Address address = AddressMapper.toEntity(request, lookup, user);
+			return AddressMapper.toResponse(addressRepository.save(address));
+		});
 	}
 
 	public Page<AddressResponse> list(Long userId, Pageable pageable) {
@@ -63,14 +69,14 @@ public class AddressService {
 		return AddressMapper.toResponse(getAddress(userId, addressId));
 	}
 
-	@Transactional
 	public AddressResponse update(Long userId, Long addressId, AddressRequest request) {
 		SecurityUtils.assertAdminOrOwner(userId);
-		Address address = getAddress(userId, addressId);
-		String zipCode = normalizeZipCode(request.zipCode());
-		zipCodeService.validate(zipCode);
-		AddressMapper.apply(address, request, zipCode);
-		return AddressMapper.toResponse(address);
+		ZipCodeLookupResponse lookup = zipCodeService.lookup(request.zipCode());
+		return transactionTemplate.execute(status -> {
+			Address address = getAddress(userId, addressId);
+			AddressMapper.apply(address, request, lookup);
+			return AddressMapper.toResponse(address);
+		});
 	}
 
 	@Transactional
@@ -88,14 +94,6 @@ public class AddressService {
 	private Address getAddress(Long userId, Long addressId) {
 		return addressRepository.findByIdAndUserId(addressId, userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-	}
-
-	private String normalizeZipCode(String zipCode) {
-		String digits = zipCode.replaceAll("\\D", "");
-		if (!digits.matches("\\d{8}")) {
-			throw new InvalidZipCodeException();
-		}
-		return digits;
 	}
 
 }
