@@ -1,0 +1,13 @@
+<mat-toolbar>
+  <a class="brand" routerLink="/me">Cadastro</a>
+  <nav>
+    <a matButton routerLink="/login" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Entrar</a>
+    <a matButton routerLink="/register" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Criar conta</a>
+    <a matButton routerLink="/me" routerLinkActive="active" ariaCurrentWhenActive="page">Minha conta</a>
+    <a matButton routerLink="/users" routerLinkActive="active" ariaCurrentWhenActive="page">Usuários</a>
+  </nav>
+</mat-toolbar>
+
+<main>
+  <router-outlet />
+</main>
