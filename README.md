@@ -160,3 +160,29 @@ guards e interceptors.
 Neste projeto, apenas o banco de dados roda no Docker Compose. O backend e o
 frontend são iniciados separadamente para facilitar o desenvolvimento, o debug
 e o hot reload durante alterações no código.
+
+## Conta de administrador
+
+A única conta com perfil de administrador é a criada automaticamente quando o
+backend inicia pela primeira vez:
+
+```txt
+email: admin@email.com
+senha: admin123
+```
+
+O cadastro pela tela de registro e a criação de usuários pelo administrador
+sempre geram contas com perfil de usuário comum (`USER`). A aplicação não
+oferece uma forma de promover outra conta a administrador.
+
+Para ter outro administrador, altere o perfil direto no banco, na coluna
+`role` da tabela `users`. Os valores aceitos são `ADMIN` e `USER`:
+
+```sql
+UPDATE users
+SET role = 'ADMIN'
+WHERE email = 'outro@email.com';
+```
+
+A conta precisa já existir. Depois da alteração, o novo perfil vale no próximo
+login.
