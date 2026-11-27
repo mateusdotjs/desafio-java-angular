@@ -7,6 +7,21 @@ export function requiredText(control: AbstractControl): ValidationErrors | null 
   return typeof value === 'string' && value.trim().length > 0 ? null : { required: true };
 }
 
+export function zipDigits(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+export function formatZipCode(value: string): string {
+  const digits = zipDigits(value);
+  return digits.length === 8 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : value;
+}
+
+export function zipCode(control: AbstractControl): ValidationErrors | null {
+  const value: unknown = control.value;
+  if (typeof value !== 'string' || zipDigits(value).length !== 8) return { zipCode: true };
+  return null;
+}
+
 export function controlError(control: AbstractControl): string | null {
   if (!control.touched || control.errors === null) return null;
   if (control.hasError('required')) return 'Campo obrigatório';
@@ -17,6 +32,8 @@ export function controlError(control: AbstractControl): string | null {
 
   const maxLength = lengthRequirement(control.getError('maxlength'));
   if (maxLength !== null) return `Máximo de ${maxLength} caracteres`;
+
+  if (control.hasError('zipCode')) return 'CEP deve ter 8 dígitos';
 
   if (control.hasError('server')) {
     const server: unknown = control.getError('server');

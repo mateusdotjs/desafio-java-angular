@@ -1,1 +1,83 @@
 <h1>{{ title }}</h1>
+
+@if (loading()) {
+  <div class="loader">
+    <mat-progress-spinner mode="indeterminate" diameter="40" />
+  </div>
+} @else if (failed()) {
+  <p class="feedback">Não foi possível carregar o endereço.</p>
+  <a matButton [routerLink]="backLink()">Voltar</a>
+} @else {
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field>
+          <mat-label>CEP</mat-label>
+          <input
+            matInput
+            formControlName="zipCode"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            (blur)="lookupZip()"
+          />
+          @if (lookingUp()) {
+            <mat-progress-spinner matSuffix mode="indeterminate" diameter="20" />
+          }
+          @if (fieldError('zipCode'); as message) {
+            <mat-error>{{ message }}</mat-error>
+          }
+        </mat-form-field>
+
+        @if (preview(); as address) {
+          <dl class="preview">
+            <div>
+              <dt>Logradouro</dt>
+              <dd>{{ address.street }}</dd>
+            </div>
+            <div>
+              <dt>Bairro</dt>
+              <dd>{{ address.neighborhood }}</dd>
+            </div>
+            <div>
+              <dt>Cidade</dt>
+              <dd>{{ address.city }}</dd>
+            </div>
+            <div>
+              <dt>Estado</dt>
+              <dd>{{ address.state }}</dd>
+            </div>
+          </dl>
+        }
+
+        <mat-form-field>
+          <mat-label>Número</mat-label>
+          <input matInput formControlName="number" autocomplete="off" />
+          @if (fieldError('number'); as message) {
+            <mat-error>{{ message }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Complemento</mat-label>
+          <input matInput formControlName="complement" autocomplete="off" />
+          @if (fieldError('complement'); as message) {
+            <mat-error>{{ message }}</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="actions">
+          <button
+            matButton="filled"
+            type="submit"
+            [disabled]="submitting() || lookingUp() || form.invalid || !previewMatches()"
+            [showProgress]="submitting()"
+          >
+            Salvar
+            <mat-progress-spinner progressIndicator mode="indeterminate" diameter="20" />
+          </button>
+          <a matButton [routerLink]="backLink()">Voltar</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+}

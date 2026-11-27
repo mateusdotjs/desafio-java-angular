@@ -25,3 +25,9 @@ export interface RegisterRequest {
   email: string;
   password: string;
 }
+
+export interface UserUpdateRequest {
+  name: string;
+  email: string;
+  password: string | null;
+}

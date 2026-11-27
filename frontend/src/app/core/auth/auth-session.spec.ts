@@ -30,6 +30,15 @@ describe('AuthSession', () => {
     if (typeof stored !== 'string') return;
     expect(JSON.parse(stored)).toEqual({ accessToken: 'token', user });
 
+    session.updateUser({ ...user, name: 'Ana Souza' });
+
+    expect(session.accessToken()).toBe('token');
+    expect(session.user()?.name).toBe('Ana Souza');
+    expect(JSON.parse(localStorage.getItem('auth.session') ?? '')).toEqual({
+      accessToken: 'token',
+      user: { ...user, name: 'Ana Souza' },
+    });
+
     session.clear();
 
     expect(session.accessToken()).toBeNull();

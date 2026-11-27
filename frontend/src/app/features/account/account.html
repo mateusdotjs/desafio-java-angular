@@ -5,13 +5,89 @@
     <mat-progress-spinner mode="indeterminate" diameter="40" />
   </div>
 } @else if (failed()) {
-  <p class="feedback">Não foi possível carregar os endereços.</p>
-} @else if (items().length === 0) {
-  <app-empty-state message="Nenhum endereço cadastrado" />
-} @else {
-  <ul class="addresses">
-    @for (address of items(); track address.id) {
-      <li>{{ address.street }}, {{ address.number }} — {{ address.city }}</li>
+  <p class="feedback">Não foi possível carregar a conta.</p>
+} @else if (profile(); as user) {
+  <mat-card class="profile">
+    <mat-card-content>
+      <dl>
+        <div>
+          <dt>Nome</dt>
+          <dd>{{ user.name }}</dd>
+        </div>
+        <div>
+          <dt>E-mail</dt>
+          <dd>{{ user.email }}</dd>
+        </div>
+        <div>
+          <dt>Papel</dt>
+          <dd>{{ roleLabel(user.role) }}</dd>
+        </div>
+        <div>
+          <dt>Cadastro</dt>
+          <dd>{{ createdAtLabel(user.createdAt) }}</dd>
+        </div>
+      </dl>
+      <div class="actions">
+        <a matButton [routerLink]="editProfileLink()">Editar dados</a>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <section class="addresses-section">
+    <div class="section-header">
+      <h2>Endereços</h2>
+      <a matButton="filled" [routerLink]="newAddressLink()">Novo endereço</a>
+    </div>
+
+    @if (listLoading()) {
+      <div class="loader">
+        <mat-progress-spinner mode="indeterminate" diameter="32" />
+      </div>
+    } @else if (items().length === 0) {
+      <app-empty-state message="Nenhum endereço cadastrado" />
+    } @else {
+      <ul class="addresses">
+        @for (address of items(); track address.id) {
+          <li>
+            <p class="line">{{ address.street }}, {{ address.number }}</p>
+            @if (address.complement) {
+              <p class="muted">{{ address.complement }}</p>
+            }
+            <p class="muted">{{ address.neighborhood }} — {{ address.city }}/{{ address.state }}</p>
+            <p class="muted">CEP {{ formatZip(address.zipCode) }}</p>
+            <div class="actions">
+              <a matButton [routerLink]="editAddressLink(address.id)">Editar</a>
+              @if (confirmingId() === address.id) {
+                <button
+                  matButton
+                  type="button"
+                  (click)="confirmDelete(address.id)"
+                  [disabled]="deletingId() !== null"
+                >
+                  Confirmar exclusão
+                </button>
+                <button matButton type="button" (click)="cancelDelete()" [disabled]="deletingId() !== null">
+                  Cancelar
+                </button>
+              } @else {
+                <button matButton type="button" (click)="askDelete(address.id)" [disabled]="deletingId() !== null">
+                  Apagar
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
     }
-  </ul>
+
+    @if (totalElements() > 0) {
+      <mat-paginator
+        [length]="totalElements()"
+        [pageIndex]="pageIndex()"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)"
+      />
+    }
+  </section>
 }

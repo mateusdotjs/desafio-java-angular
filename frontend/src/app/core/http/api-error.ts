@@ -20,6 +20,10 @@ const KNOWN_MESSAGES: Record<string, string> = {
   'Authentication required': 'Sessão expirada. Entre novamente.',
   'Access denied': 'Você não tem permissão para esta ação.',
   'Validation failed': 'Revise os campos destacados.',
+  'Invalid zip code': 'CEP inválido ou não encontrado.',
+  'Zip code service is unavailable': 'A consulta de CEP está indisponível.',
+  'User not found': 'Usuário não encontrado.',
+  'Address not found': 'Endereço não encontrado.',
 };
 
 const FIELD_MESSAGES: Record<string, string> = {
@@ -27,7 +31,9 @@ const FIELD_MESSAGES: Record<string, string> = {
   'must not be empty': 'Campo obrigatório',
   'must be a well-formed email address': 'E-mail inválido',
   'size must be between 8 and 72': 'A senha deve ter entre 8 e 72 caracteres',
+  'size must be between 0 and 20': 'Máximo de 20 caracteres',
   'size must be between 0 and 255': 'Máximo de 255 caracteres',
+  'must match "^\\d{8}$"': 'CEP deve ter 8 dígitos',
 };
 
 export function readApiError(error: unknown): ApiErrorBody | null {

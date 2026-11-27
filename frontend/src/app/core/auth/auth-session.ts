@@ -32,17 +32,28 @@ export class AuthSession {
   establish(accessToken: string, user: User): void {
     this.accessTokenState.set(accessToken);
     this.userState.set(user);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ accessToken, user } satisfies StoredSession));
-    } catch {
-      // A sessão continua em memória quando o navegador bloqueia o armazenamento.
-    }
+    this.persist(accessToken, user);
+  }
+
+  updateUser(user: User): void {
+    const accessToken = this.accessTokenState();
+    if (accessToken === null) return;
+    this.userState.set(user);
+    this.persist(accessToken, user);
   }
 
   clear(): void {
     this.accessTokenState.set(null);
     this.userState.set(null);
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  private persist(accessToken: string, user: User): void {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ accessToken, user } satisfies StoredSession));
+    } catch {
+      // A sessão continua em memória quando o navegador bloqueia o armazenamento.
+    }
   }
 }
 
